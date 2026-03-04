@@ -4,101 +4,94 @@ const path = require('path');
 // Years: 2021-2033
 const years = [2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033];
 
-// Geographies with their region grouping
-const regions = {
-  "North America": ["U.S.", "Canada"],
-  "Europe": ["U.K.", "Germany", "Italy", "France", "Spain", "Russia", "Rest of Europe"],
-  "Asia Pacific": ["China", "India", "Japan", "South Korea", "ASEAN", "Australia", "Rest of Asia Pacific"],
-  "Latin America": ["Brazil", "Argentina", "Mexico", "Rest of Latin America"],
-  "Middle East & Africa": ["GCC", "South Africa", "Rest of Middle East & Africa"]
-};
+// Geography: US only
+const geographies = ["U.S."];
 
-// New segment definitions with market share splits (proportions within each segment type)
-const segmentTypes = {
-  "By Type": {
-    "Sub-Normothermic Perfusion (20–34°C)": 0.55,
-    "Warm or Normothermic Perfusion (35–37°C)": 0.45
+// Segment definitions with market share splits
+// Flat segments
+const flatSegmentTypes = {
+  "By Banking Organization Type": {
+    "Global Investment Banks": 0.30,
+    "Universal Banks": 0.28,
+    "Private / Wealth Management Banks": 0.22,
+    "Central Banks & Development Finance Institutions": 0.12,
+    "Others (Fintech, Operations Centers, etc.)": 0.08
   },
-  "By Organ Type": {
-    "Liver": 0.35,
-    "Heart": 0.22,
-    "Lung": 0.18,
-    "Kidney": 0.15,
-    "Others (Pancreas, Small bowel / Intestine, Composite Tissues / Limb Perfusion (emerging use cases))": 0.10
-  },
-  "Application / Use Case": {
-    "Organ Preservation": 0.30,
-    "Viability Assessment": 0.25,
-    "Physiologic Transport": 0.20,
-    "Reconditioning Marginal Organs": 0.15,
-    "Others (Research Use / Protocol development)": 0.10
-  },
-  "By End User": {
-    "Hospitals & Clinics": 0.40,
-    "Specialty Clinic/Centers": 0.25,
-    "Transplant Centers": 0.25,
-    "Others (Research Institutes/Centers, Organ Procurement Organizations, etc.)": 0.10
+  "By Time Horizon": {
+    "Permanent Relocations": 0.45,
+    "Rotational Assignments (1–3 years)": 0.35,
+    "Temporary Deployments (<12 months)": 0.20
   }
 };
 
-// Regional base values (USD Million) for 2021 - total market per region
-// Global Normothermic Machine Perfusion market ~$300M in 2021, growing ~12% CAGR
-const regionBaseValues = {
-  "North America": 120,
-  "Europe": 90,
-  "Asia Pacific": 50,
-  "Latin America": 20,
-  "Middle East & Africa": 15
-};
-
-// Country share within region (must sum to ~1.0)
-const countryShares = {
-  "North America": { "U.S.": 0.82, "Canada": 0.18 },
-  "Europe": { "U.K.": 0.18, "Germany": 0.22, "Italy": 0.12, "France": 0.16, "Spain": 0.10, "Russia": 0.08, "Rest of Europe": 0.14 },
-  "Asia Pacific": { "China": 0.28, "India": 0.12, "Japan": 0.25, "South Korea": 0.12, "ASEAN": 0.10, "Australia": 0.07, "Rest of Asia Pacific": 0.06 },
-  "Latin America": { "Brazil": 0.45, "Argentina": 0.15, "Mexico": 0.25, "Rest of Latin America": 0.15 },
-  "Middle East & Africa": { "GCC": 0.45, "South Africa": 0.25, "Rest of Middle East & Africa": 0.30 }
-};
-
-// Growth rates (CAGR) per region - slightly different for variety
-const regionGrowthRates = {
-  "North America": 0.115,
-  "Europe": 0.108,
-  "Asia Pacific": 0.145,
-  "Latin America": 0.125,
-  "Middle East & Africa": 0.118
-};
-
-// Segment-specific growth multipliers (relative to regional base CAGR)
-const segmentGrowthMultipliers = {
-  "By Type": {
-    "Sub-Normothermic Perfusion (20–34°C)": 0.95,
-    "Warm or Normothermic Perfusion (35–37°C)": 1.07
-  },
-  "By Organ Type": {
-    "Liver": 1.08,
-    "Heart": 1.05,
-    "Lung": 1.12,
-    "Kidney": 0.95,
-    "Others (Pancreas, Small bowel / Intestine, Composite Tissues / Limb Perfusion (emerging use cases))": 1.20
-  },
-  "Application / Use Case": {
-    "Organ Preservation": 0.92,
-    "Viability Assessment": 1.15,
-    "Physiologic Transport": 1.05,
-    "Reconditioning Marginal Organs": 1.18,
-    "Others (Research Use / Protocol development)": 1.10
-  },
-  "By End User": {
-    "Hospitals & Clinics": 0.98,
-    "Specialty Clinic/Centers": 1.10,
-    "Transplant Centers": 1.08,
-    "Others (Research Institutes/Centers, Organ Procurement Organizations, etc.)": 1.05
+// Hierarchical segment: By Move Type
+const hierarchicalSegmentTypes = {
+  "By Move Type": {
+    "Employee Mobility": {
+      share: 0.55,
+      children: {
+        "Executive / Expat Moves": 0.30,
+        "Project / Assignment Moves": 0.25,
+        "Mass / Business Unit Moves": 0.20,
+        "Graduate / Rotation Programs": 0.15,
+        "Return / Exit Moves": 0.10
+      }
+    },
+    "Asset Mobility": {
+      share: 0.45,
+      children: {
+        "Office & Branch Relocations": 0.30,
+        "IT Infrastructure Moves": 0.25,
+        "Data Center Migrations": 0.20,
+        "Archive & Records Relocation": 0.15,
+        "Others (Fine Art / High-Value Asset Transport, etc.)": 0.10
+      }
+    }
   }
 };
 
-// Volume multiplier: units per USD Million (rough: ~500 units per $1M for perfusion devices)
-const volumePerMillionUSD = 480;
+// US base value (USD Million) for 2021 - total market
+// Banking relocation services market ~$800M in US in 2021, growing ~9% CAGR
+const baseValue = 800;
+const baseGrowthRate = 0.09;
+
+// Segment-specific growth multipliers
+const flatGrowthMultipliers = {
+  "By Banking Organization Type": {
+    "Global Investment Banks": 1.05,
+    "Universal Banks": 0.95,
+    "Private / Wealth Management Banks": 1.12,
+    "Central Banks & Development Finance Institutions": 0.88,
+    "Others (Fintech, Operations Centers, etc.)": 1.20
+  },
+  "By Time Horizon": {
+    "Permanent Relocations": 0.92,
+    "Rotational Assignments (1–3 years)": 1.08,
+    "Temporary Deployments (<12 months)": 1.15
+  }
+};
+
+const hierarchicalGrowthMultipliers = {
+  "By Move Type": {
+    "Employee Mobility": {
+      "Executive / Expat Moves": 1.05,
+      "Project / Assignment Moves": 1.10,
+      "Mass / Business Unit Moves": 0.95,
+      "Graduate / Rotation Programs": 1.15,
+      "Return / Exit Moves": 0.90
+    },
+    "Asset Mobility": {
+      "Office & Branch Relocations": 0.98,
+      "IT Infrastructure Moves": 1.18,
+      "Data Center Migrations": 1.22,
+      "Archive & Records Relocation": 0.88,
+      "Others (Fine Art / High-Value Asset Transport, etc.)": 1.08
+    }
+  }
+};
+
+// Volume multiplier: units per USD Million
+const volumePerMillionUSD = 120;
 
 // Seeded pseudo-random for reproducibility
 let seed = 42;
@@ -119,11 +112,11 @@ function roundToInt(val) {
   return Math.round(val);
 }
 
-function generateTimeSeries(baseValue, growthRate, roundFn) {
+function generateTimeSeries(baseVal, growthRate, roundFn) {
   const series = {};
   for (let i = 0; i < years.length; i++) {
     const year = years[i];
-    const rawValue = baseValue * Math.pow(1 + growthRate, i);
+    const rawValue = baseVal * Math.pow(1 + growthRate, i);
     series[year] = roundFn(addNoise(rawValue));
   }
   return series;
@@ -134,49 +127,32 @@ function generateData(isVolume) {
   const roundFn = isVolume ? roundToInt : roundTo1;
   const multiplier = isVolume ? volumePerMillionUSD : 1;
 
-  // Generate data for each region and country
-  for (const [regionName, countries] of Object.entries(regions)) {
-    const regionBase = regionBaseValues[regionName] * multiplier;
-    const regionGrowth = regionGrowthRates[regionName];
+  for (const geo of geographies) {
+    const geoBase = baseValue * multiplier;
+    const geoGrowth = baseGrowthRate;
 
-    // Region-level data
-    data[regionName] = {};
-    for (const [segType, segments] of Object.entries(segmentTypes)) {
-      data[regionName][segType] = {};
+    data[geo] = {};
+
+    // Generate flat segments
+    for (const [segType, segments] of Object.entries(flatSegmentTypes)) {
+      data[geo][segType] = {};
       for (const [segName, share] of Object.entries(segments)) {
-        const segGrowth = regionGrowth * segmentGrowthMultipliers[segType][segName];
-        const segBase = regionBase * share;
-        data[regionName][segType][segName] = generateTimeSeries(segBase, segGrowth, roundFn);
+        const segGrowth = geoGrowth * flatGrowthMultipliers[segType][segName];
+        const segBase = geoBase * share;
+        data[geo][segType][segName] = generateTimeSeries(segBase, segGrowth, roundFn);
       }
     }
 
-    // Add "By Country" for each region
-    data[regionName]["By Country"] = {};
-    for (const country of countries) {
-      const cShare = countryShares[regionName][country];
-      // Use a slight variation of region growth per country
-      const countryGrowthVariation = 1 + (seededRandom() - 0.5) * 0.06;
-      const countryBase = regionBase * cShare;
-      const countryGrowth = regionGrowth * countryGrowthVariation;
-      data[regionName]["By Country"][country] = generateTimeSeries(countryBase, countryGrowth, roundFn);
-    }
-
-    // Country-level data
-    for (const country of countries) {
-      const cShare = countryShares[regionName][country];
-      const countryBase = regionBase * cShare;
-      const countryGrowthVariation = 1 + (seededRandom() - 0.5) * 0.04;
-      const countryGrowth = regionGrowth * countryGrowthVariation;
-
-      data[country] = {};
-      for (const [segType, segments] of Object.entries(segmentTypes)) {
-        data[country][segType] = {};
-        for (const [segName, share] of Object.entries(segments)) {
-          const segGrowth = countryGrowth * segmentGrowthMultipliers[segType][segName];
-          const segBase = countryBase * share;
-          // Add slight country-specific variation to segment share
-          const shareVariation = 1 + (seededRandom() - 0.5) * 0.1;
-          data[country][segType][segName] = generateTimeSeries(segBase * shareVariation, segGrowth, roundFn);
+    // Generate hierarchical segments (By Move Type)
+    for (const [segType, parentSegments] of Object.entries(hierarchicalSegmentTypes)) {
+      data[geo][segType] = {};
+      for (const [parentName, parentConfig] of Object.entries(parentSegments)) {
+        data[geo][segType][parentName] = {};
+        const parentBase = geoBase * parentConfig.share;
+        for (const [childName, childShare] of Object.entries(parentConfig.children)) {
+          const childGrowth = geoGrowth * hierarchicalGrowthMultipliers[segType][parentName][childName];
+          const childBase = parentBase * childShare;
+          data[geo][segType][parentName][childName] = generateTimeSeries(childBase, childGrowth, roundFn);
         }
       }
     }
@@ -197,7 +173,8 @@ fs.writeFileSync(path.join(outDir, 'value.json'), JSON.stringify(valueData, null
 fs.writeFileSync(path.join(outDir, 'volume.json'), JSON.stringify(volumeData, null, 2));
 
 console.log('Generated value.json and volume.json successfully');
-console.log('Value geographies:', Object.keys(valueData).length);
-console.log('Volume geographies:', Object.keys(volumeData).length);
-console.log('Segment types:', Object.keys(valueData['North America']));
-console.log('Sample - North America, By Type:', JSON.stringify(valueData['North America']['By Type'], null, 2));
+console.log('Geographies:', Object.keys(valueData));
+console.log('Segment types:', Object.keys(valueData['U.S.']));
+console.log('Sample - U.S., By Banking Organization Type:', JSON.stringify(valueData['U.S.']['By Banking Organization Type'], null, 2));
+console.log('Sample - U.S., By Move Type keys:', Object.keys(valueData['U.S.']['By Move Type']));
+console.log('Sample - U.S., By Move Type, Employee Mobility keys:', Object.keys(valueData['U.S.']['By Move Type']['Employee Mobility']));

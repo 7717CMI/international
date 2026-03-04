@@ -1152,8 +1152,8 @@ async function processSegmentTypeAsync(
           cagr = data.CAGR
         }
       } else {
-        // Calculate CAGR from base year (2023) to forecast year
-        const cagrStartYear = allYears[0] + 4 // Base year = 2023 for 2019-2031 data
+        // Calculate CAGR from start year to forecast year
+        const cagrStartYear = allYears[0] // Use first year as CAGR start
         const cagrEndYear = allYears[allYears.length - 1]
         const startVal = timeSeries[cagrStartYear] || 0
         const endVal = timeSeries[cagrEndYear] || 0
@@ -1233,9 +1233,9 @@ export async function processJsonDataAsync(
     }
     const startYear = Math.min(...allYears)
     const forecastYear = Math.max(...allYears)
-    const baseYear = startYear + 5 // Base year = 2026 for 2021-2033 data
+    const baseYear = startYear // Base year = start year (2025 for 2025-2033 data)
     // Historical/Forecast split: years before base year are historical
-    const historicalEndYear = baseYear - 1 // 2025
+    const historicalEndYear = baseYear - 1 // No historical years when base = start
     console.log(`Years: ${startYear} to ${forecastYear}, base: ${baseYear}, historical end: ${historicalEndYear}`)
     
     // Extract geographies from segmentation data (first level keys)
@@ -1472,7 +1472,7 @@ export async function processJsonDataAsync(
     
     // Build metadata
     const metadata: Metadata = {
-      market_name: 'Normothermic Machine Perfusion Market',
+      market_name: ' Banking Industry International Moving Market',
       market_type: 'Market Analysis',
       industry: 'Healthcare & Pharmaceuticals',
       years: allYears,

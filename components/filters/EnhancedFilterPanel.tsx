@@ -371,11 +371,49 @@ export function EnhancedFilterPanel() {
               setSelectedSegmentType(newSegmentType)
               setCurrentSegmentSelection('') // Clear selection when type changes
               setCascadePath([]) // Clear cascade path when type changes
-              // Update store - this will trigger save/restore of geography filters
-              updateFilters({ 
-                segmentType: newSegmentType,
-                segments: [] // Clear segments when type changes
-              })
+
+              // For hierarchical segments, auto-select first 3 leaf children
+              const newSegDimension = data?.dimensions?.segments?.[newSegmentType]
+              const newHierarchy = newSegDimension?.hierarchy || {}
+              const hasHierarchy = Object.values(newHierarchy).some((children: any) => Array.isArray(children) && children.length > 0)
+
+              if (hasHierarchy) {
+                // Select parent segments (e.g., "Employee Mobility", "Asset Mobility")
+                // These have aggregated data and selecting them shows parent-level totals
+                const parentSegments: string[] = []
+                for (const [parent, children] of Object.entries(newHierarchy)) {
+                  if (Array.isArray(children) && children.length > 0) {
+                    parentSegments.push(parent)
+                  }
+                }
+                const autoSelected = parentSegments
+                const autoSegments = autoSelected.map(seg => ({
+                  type: newSegmentType,
+                  segment: seg,
+                  id: `${newSegmentType}::${seg}`
+                }))
+                setSelectedSegments(autoSegments)
+                updateFilters({
+                  segmentType: newSegmentType,
+                  segments: autoSelected,
+                  advancedSegments: autoSegments,
+                } as any)
+              } else {
+                // Flat segments: auto-select first 3 items
+                const items = newSegDimension?.items || []
+                const autoSelected = items.slice(0, 3)
+                const autoSegments = autoSelected.map((seg: string) => ({
+                  type: newSegmentType,
+                  segment: seg,
+                  id: `${newSegmentType}::${seg}`
+                }))
+                setSelectedSegments(autoSegments)
+                updateFilters({
+                  segmentType: newSegmentType,
+                  segments: autoSelected,
+                  advancedSegments: autoSegments,
+                } as any)
+              }
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           >

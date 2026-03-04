@@ -1,63 +1,39 @@
 {
-  "Global": {
-    "By Type": {
-      "Sub-Normothermic Perfusion (20–34°C)": {},
-      "Warm or Normothermic Perfusion (35–37°C)": {}
+  "U.S.": {
+    "By Banking Organization Type": {
+      "Global Investment Banks": {},
+      "Universal Banks": {},
+      "Private / Wealth Management Banks": {},
+      "Central Banks & Development Finance Institutions": {},
+      "Others (Fintech, Operations Centers, etc.)": {}
     },
-    "By Organ Type": {
-      "Liver": {},
-      "Heart": {},
-      "Lung": {},
-      "Kidney": {},
-      "Others (Pancreas, Small bowel / Intestine, Composite Tissues / Limb Perfusion (emerging use cases))": {}
-    },
-    "Application / Use Case": {
-      "Organ Preservation": {},
-      "Viability Assessment": {},
-      "Physiologic Transport": {},
-      "Reconditioning Marginal Organs": {},
-      "Others (Research Use / Protocol development)": {}
-    },
-    "By End User": {
-      "Hospitals & Clinics": {},
-      "Specialty Clinic/Centers": {},
-      "Transplant Centers": {},
-      "Others (Research Institutes/Centers, Organ Procurement Organizations, etc.)": {}
-    },
-    "By Region": {
-      "North America": {
-        "U.S.": {},
-        "Canada": {}
+    "By Move Type": {
+      "Employee Mobility": {
+        "Executive / Expat Moves": {},
+        "Project / Assignment Moves": {},
+        "Mass / Business Unit Moves": {},
+        "Graduate / Rotation Programs": {},
+        "Return / Exit Moves": {}
       },
-      "Europe": {
-        "U.K.": {},
-        "Germany": {},
-        "Italy": {},
-        "France": {},
-        "Spain": {},
-        "Russia": {},
-        "Rest of Europe": {}
-      },
-      "Asia Pacific": {
-        "China": {},
-        "India": {},
-        "Japan": {},
-        "South Korea": {},
-        "ASEAN": {},
-        "Australia": {},
-        "Rest of Asia Pacific": {}
-      },
-      "Latin America": {
-        "Brazil": {},
-        "Argentina": {},
-        "Mexico": {},
-        "Rest of Latin America": {}
-      },
-      "Middle East & Africa": {
-        "GCC": {},
-        "South Africa": {},
-        "Rest of Middle East & Africa": {}
+      "Asset Mobility": {
+        "Office & Branch Relocations": {},
+        "IT Infrastructure Moves": {},
+        "Data Center Migrations": {},
+        "Archive & Records Relocation": {},
+        "Others (Fine Art / High-Value Asset Transport, etc.)": {}
       }
+    },
+    "By Time Horizon": {
+      "Permanent Relocations": {},
+      "Rotational Assignments (1–3 years)": {},
+      "Temporary Deployments  (<12 months)": {}
+    },
+    "By U.S. Region": {
+      "Northeast": {},
+      "Southeast": {},
+      "Midwest": {},
+      "West": {},
+      "Southwest": {}
     }
   }
 }
