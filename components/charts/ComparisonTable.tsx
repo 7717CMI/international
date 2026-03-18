@@ -26,21 +26,20 @@ export function ComparisonTable({ title, height = 600 }: ComparisonTableProps) {
     // Filter data
     const filtered = filterData(dataset, filters)
 
-    // Get the selected year (use base year or middle of range)
-    const year = filters.yearRange[0] + Math.floor((filters.yearRange[1] - filters.yearRange[0]) / 2)
+    // Always show 2026 value; CAGR always calculated from 2026 to 2033
+    const displayYear = 2026
+    const cagrStartYear = 2026
+    const cagrEndYear = 2033
+    const cagrYears = cagrEndYear - cagrStartYear
     const startYear = filters.yearRange[0]
     const endYear = filters.yearRange[1]
 
-    // Helper function to parse CAGR (handles string, number, or null)
-    const parseCAGR = (cagr: any): number => {
-      if (cagr === null || cagr === undefined) return 0
-      if (typeof cagr === 'number') return cagr
-      if (typeof cagr === 'string') {
-        // Extract number from string like "5.2%" or "5.2"
-        const cagrStr = cagr.replace('%', '').trim()
-        return parseFloat(cagrStr) || 0
-      }
-      return 0
+    // Calculate CAGR from 2026 to 2033
+    const calcCAGR = (timeSeries: Record<number, number>): number => {
+      const v0 = timeSeries[cagrStartYear]
+      const vn = timeSeries[cagrEndYear]
+      if (!v0 || !vn || v0 <= 0) return 0
+      return (Math.pow(vn / v0, 1 / cagrYears) - 1) * 100
     }
 
     // Transform to table format
@@ -48,13 +47,13 @@ export function ComparisonTable({ title, height = 600 }: ComparisonTableProps) {
       geography: record.geography,
       segment: record.segment,
       segmentType: record.segment_type,
-      currentValue: record.time_series[year] || 0,
+      currentValue: record.time_series[displayYear] || 0,
       startValue: record.time_series[startYear] || 0,
       endValue: record.time_series[endYear] || 0,
-      growth: record.time_series[startYear] > 0 
+      growth: record.time_series[startYear] > 0
         ? (((record.time_series[endYear] || 0) - (record.time_series[startYear] || 0)) / record.time_series[startYear] * 100)
         : 0,
-      cagr: parseCAGR(record.cagr),
+      cagr: calcCAGR(record.time_series),
       marketShare: record.market_share || 0,
       sparkline: Object.entries(record.time_series)
         .filter(([y]) => parseInt(y) >= startYear && parseInt(y) <= endYear)
@@ -148,8 +147,8 @@ export function ComparisonTable({ title, height = 600 }: ComparisonTableProps) {
     )
   }
 
-  const year = filters.yearRange[0] + Math.floor((filters.yearRange[1] - filters.yearRange[0]) / 2)
-  const valueUnit = filters.dataType === 'value' 
+  const year = 2026
+  const valueUnit = filters.dataType === 'value'
     ? `${data.metadata.currency} ${data.metadata.value_unit}`
     : data.metadata.volume_unit
 
